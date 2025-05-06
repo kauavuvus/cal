@@ -2,82 +2,105 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Calculadora de Munições - GTA RP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #1e1e1e 0%, #2c2c2c 100%);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
       color: #f5f5f5;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 20px;
     }
 
     .container {
-      width: 90%;
-      max-width: 600px;
+      max-width: 480px;
+      margin: auto;
       background: #1c1c1c;
-      padding: 30px;
+      padding: 25px 20px;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
     }
 
     h1 {
       text-align: center;
       color: #ff4c4c;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .tabs button {
+      flex: 1;
+      padding: 10px;
+      font-weight: bold;
+      background: #2e2e2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      font-size: 14px;
+    }
+
+    .tabs button.active {
+      background: #ff4c4c;
+      box-shadow: 0 0 6px #ff4c4c88;
+    }
+
+    .tabs button:active {
+      transform: scale(0.98);
+    }
+
+    .content {
+      display: none;
+    }
+
+    .content.active {
+      display: block;
     }
 
     label {
       display: block;
-      margin-top: 20px;
+      margin-top: 15px;
       font-weight: bold;
-      color: #f5f5f5;
+      font-size: 14px;
     }
 
     input {
       width: 100%;
       padding: 10px;
-      margin-top: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
       background: #2e2e2e;
       color: #fff;
-      box-shadow: inset 0 0 5px #00000055;
+      font-size: 16px;
     }
 
     .result {
-      margin-top: 30px;
-      padding: 20px;
+      margin-top: 20px;
+      padding: 15px;
       background: #262626;
       border-left: 6px solid #ff4c4c;
       border-radius: 10px;
-      color: #fff;
-    }
-
-    .result strong {
-      display: block;
-      font-size: 18px;
-      color: #ff4c4c;
-      margin-bottom: 10px;
+      font-size: 15px;
     }
 
     .result p {
-      margin: 8px 0;
-      font-size: 16px;
+      margin: 6px 0;
       border-bottom: 1px solid #3a3a3a;
       padding: 4px 8px;
-      transition: background 0.3s, transform 0.3s;
       border-radius: 6px;
+      transition: background 0.3s, transform 0.2s;
     }
 
     .result p:hover {
@@ -87,13 +110,15 @@
 
     footer {
       text-align: center;
-      margin-top: 25px;
-      font-size: 14px;
+      margin-top: 20px;
+      font-size: 13px;
       color: #aaa;
     }
 
-    input:focus {
-      outline: 2px solid #ff4c4c;
+    @media (max-width: 600px) {
+      .tabs {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -101,51 +126,98 @@
   <div class="container">
     <h1>Calculadora de Munições - GTA RP</h1>
 
-    <label for="quantidade">Quantidade de munições (múltiplos de 10):</label>
-    <input type="number" id="quantidade" value="1000" step="10" min="10">
+    <div class="tabs">
+      <button onclick="showTab('calc1')" class="active">Calculadora Munição</button>
+      <button onclick="showTab('calc2')">Calculadora Reciclável</button>
+    </div>
 
-    <label for="preco">Preço de venda por munição (R$):</label>
-    <input type="number" id="preco" value="10" step="0.01" min="0">
+    <div id="calc1" class="content active">
+      <label for="quantidade">Quantidade de munições (múltiplos de 10):</label>
+      <input type="number" id="quantidade" value="1000" step="10" min="10">
 
-    <div class="result" id="resultado"></div>
+      <label for="preco">Preço de venda por munição (R$):</label>
+      <input type="number" id="preco" value="10" step="0.01" min="0">
+
+      <div class="result" id="resultado1"></div>
+    </div>
+
+    <div id="calc2" class="content">
+      <label for="reciclavel">Quantidade de matéria reciclável:</label>
+      <input type="number" id="reciclavel" value="6000" step="1" min="0">
+
+      <div class="result" id="resultado2"></div>
+    </div>
+
     <footer>Criado por Kauã</footer>
   </div>
 
   <script>
-    function calcular() {
-      const qtdMuni = parseInt(document.getElementById("quantidade").value);
-      const preco = parseFloat(document.getElementById("preco").value);
-      const resultadoDiv = document.getElementById("resultado");
+    function showTab(id) {
+      document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
 
-      if (qtdMuni < 10 || qtdMuni % 10 !== 0) {
-        resultadoDiv.innerHTML = "<strong>Digite um valor válido em múltiplos de 10 (ex: 10, 20, 30...)</strong>";
+    function calcularPrimeira() {
+      const qtd = parseInt(document.getElementById("quantidade").value);
+      const preco = parseFloat(document.getElementById("preco").value);
+      const res = document.getElementById("resultado1");
+
+      if (qtd < 10 || qtd % 10 !== 0) {
+        res.innerHTML = "<strong>Use múltiplos de 10 (ex: 10, 20, 30...)</strong>";
         return;
       }
 
-      const lotes = qtdMuni / 10;
+      const lotes = qtd / 10;
       const sucata = lotes * 10;
-      const aço = lotes * 10;
+      const aco = lotes * 10;
       const vidro = lotes * 5;
       const aluminio = lotes * 5;
+      const reciclavel = (sucata + aco + vidro + aluminio) * 2;
+      const lucro = qtd * preco;
 
-      const totalReciclagem = (sucata + aço + vidro + aluminio) * 2;
-      const faturamento = qtdMuni * preco;
-
-      resultadoDiv.innerHTML = `
-        <strong>Resumo para ${qtdMuni} munições:</strong>
-        <p>Lotes necessários: ${lotes}</p>
+      res.innerHTML = `
+        <p><strong>${qtd} munições:</strong></p>
         <p>Sucatas: ${sucata}</p>
-        <p>Aços: ${aço}</p>
+        <p>Aços: ${aco}</p>
         <p>Vidros: ${vidro}</p>
         <p>Alumínios: ${aluminio}</p>
-        <p><strong>Total de matérias de reciclagem:</strong> ${totalReciclagem}</p>
-        <p><strong>Faturamento total:</strong> R$ ${faturamento.toFixed(2)}</p>
+        <p>Total recicláveis: ${reciclavel}</p>
+        <p>Faturamento: R$ ${lucro.toFixed(2)}</p>
       `;
     }
 
-    document.getElementById("quantidade").addEventListener("input", calcular);
-    document.getElementById("preco").addEventListener("input", calcular);
-    calcular();
+    function calcularSegunda() {
+      const reciclavel = parseInt(document.getElementById("reciclavel").value);
+      const res = document.getElementById("resultado2");
+
+      const materiais = Math.floor(reciclavel / 2);
+      const lotes = Math.min(
+        Math.floor(materiais / 10),
+        Math.floor(materiais / 10),
+        Math.floor(materiais / 5),
+        Math.floor(materiais / 5)
+      );
+      const municoes = lotes * 10;
+
+      res.innerHTML = `
+        <p><strong>Com ${reciclavel} recicláveis:</strong></p>
+        <p>- ${materiais} Sucatas</p>
+        <p>- ${materiais} Aços</p>
+        <p>- ${materiais} Vidros</p>
+        <p>- ${materiais} Alumínios</p>
+        <p>Lotes possíveis: ${lotes}</p>
+        <p>Total de munições: ${municoes}</p>
+      `;
+    }
+
+    document.getElementById("quantidade").addEventListener("input", calcularPrimeira);
+    document.getElementById("preco").addEventListener("input", calcularPrimeira);
+    document.getElementById("reciclavel").addEventListener("input", calcularSegunda);
+
+    calcularPrimeira();
+    calcularSegunda();
   </script>
 </body>
 </html>
