@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Munições - GTA RP</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(255, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #e74c3c;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #f5f5f5;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 16px;
+      background: #2c2c2c;
+      color: #fff;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #2c2c2c;
+      border-left: 6px solid #e74c3c;
+      border-radius: 8px;
+      color: #fff;
+    }
+
+    .result strong {
+      display: block;
+      font-size: 18px;
+      color: #e74c3c;
+      margin-bottom: 10px;
+    }
+
+    .result p {
+      margin: 8px 0;
+      padding: 4px 0;
+      border-bottom: 1px solid #3a3a3a;
+      font-size: 16px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    input:focus {
+      outline: 2px solid #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calculadora de Munições - GTA RP</h1>
+
+    <label for="quantidade">Quantidade de munições (múltiplos de 10):</label>
+    <input type="number" id="quantidade" value="1000" step="10" min="10">
+
+    <label for="preco">Preço de venda por munição (R$):</label>
+    <input type="number" id="preco" value="10" step="0.01" min="0">
+
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <footer>
+    Criado por Kauã
+  </footer>
+
+  <script>
+    function calcular() {
+      const qtdMuni = parseInt(document.getElementById("quantidade").value);
+      const preco = parseFloat(document.getElementById("preco").value);
+      const resultadoDiv = document.getElementById("resultado");
+
+      if (qtdMuni < 10 || qtdMuni % 10 !== 0) {
+        resultadoDiv.innerHTML = "<strong>Digite um valor válido em múltiplos de 10 (ex: 10, 20, 30...)</strong>";
+        return;
+      }
+
+      const lotes = qtdMuni / 10;
+
+      const sucata = lotes * 10;
+      const aço = lotes * 10;
+      const vidro = lotes * 5;
+      const aluminio = lotes * 5;
+
+      const totalReciclagem = (sucata + aço + vidro + aluminio) * 2;
+      const faturamento = qtdMuni * preco;
+
+      resultadoDiv.innerHTML = `
+        <strong>Resumo para ${qtdMuni} munições:</strong>
+        <p>Lotes necessários: ${lotes}</p>
+        <p>Sucatas: ${sucata}</p>
+        <p>Aços: ${aço}</p>
+        <p>Vidros: ${vidro}</p>
+        <p>Alumínios: ${aluminio}</p>
+        <p><strong>Total de matérias de reciclagem:</strong> ${totalReciclagem}</p>
+        <p><strong>Faturamento total:</strong> R$ ${faturamento.toFixed(2)}</p>
+      `;
+    }
+
+    document.getElementById("quantidade").addEventListener("input", calcular);
+    document.getElementById("preco").addEventListener("input", calcular);
+    calcular();
+  </script>
+</body>
+</html>
