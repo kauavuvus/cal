@@ -1,177 +1,266 @@
-<!DOCTYPE html><html lang="pt-br">
+
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <title>Calculadora de Munições - GTA RP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
-  color: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  min-height: 100vh;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container {
-  width: 100%;
-  max-width: 600px;
-  background: #1c1c1c;
-  padding: 30px 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-}
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
+      color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
 
-h1 {
-  text-align: center;
-  color: #ff4c4c;
-  margin-bottom: 20px;
-  font-size: 22px;
-}
+    .container {
+      width: 100%;
+      max-width: 550px;
+      background: #1c1c1c;
+      padding: 30px 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 12px rgba(255, 76, 76, 0.5);
+    }
 
-.weapon-select {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
-}
+    h1 {
+      text-align: center;
+      color: #ff4c4c;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
 
-.weapon-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
-  background: #2e2e2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.3s, background 0.3s;
-}
+    .tabs {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
 
-.weapon-icon:hover, .weapon-icon.active {
-  background: #ff4c4c;
-  transform: scale(1.1);
-}
+    .tabs button {
+      flex: 1;
+      padding: 12px;
+      font-weight: bold;
+      background: #2e2e2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      font-size: 15px;
+    }
 
-.weapon-icon img {
-  width: 30px;
-  height: auto;
-}
+    .tabs button.active {
+      background: #ff4c4c;
+      box-shadow: 0 0 6px #ff4c4c88;
+    }
 
-label {
-  display: block;
-  margin-top: 15px;
-  font-weight: bold;
-  font-size: 14px;
-}
+    .tabs button:active {
+      transform: scale(0.98);
+    }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: none;
-  background: #2e2e2e;
-  color: #fff;
-  font-size: 16px;
-}
+    .content {
+      display: none;
+    }
 
-.result {
-  margin-top: 20px;
-  padding: 15px;
-  background: #262626;
-  border-left: 6px solid #ff4c4c;
-  border-radius: 10px;
-  font-size: 15px;
-}
+    .content.active {
+      display: block;
+    }
 
-.result p {
-  margin: 6px 0;
-  border-bottom: 1px solid #3a3a3a;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-footer {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 13px;
-  color: #aaa;
-}
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: none;
+      background: #2e2e2e;
+      color: #fff;
+      font-size: 16px;
+    }
 
+    .wheel-selector {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tipo-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid #444;
+      background: #2e2e2e;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      text-align: center;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tipo-btn.active {
+      background: #ff4c4c;
+      border-color: #ff4c4c;
+      box-shadow: 0 0 8px #ff4c4c88;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #262626;
+      border-left: 6px solid #ff4c4c;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .result p {
+      margin: 6px 0;
+      border-bottom: 1px solid #3a3a3a;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Calculadora de Munições - GTA RP</h1><div class="weapon-select">
-  <div class="weapon-icon active" data-type="fuzil"><img src="https://i.imgur.com/7NrcCFe.png" alt="Fuzil"></div>
-  <div class="weapon-icon" data-type="sub"><img src="https://i.imgur.com/5cK2dWI.png" alt="SMG"></div>
-  <div class="weapon-icon" data-type="pistola"><img src="https://i.imgur.com/SRfJz0V.png" alt="Pistola"></div>
-  <div class="weapon-icon" data-type="metralhadora"><img src="https://i.imgur.com/TGnXK8n.png" alt="Metralhadora"></div>
-</div>
+    <h1>Calculadora de Munições - GTA RP</h1>
 
-<label for="quantidade">Quantidade de munições (múltiplos de 10):</label>
-<input type="number" id="quantidade" value="1000" step="10" min="10">
+    <div class="tabs">
+      <button onclick="showTab('calc1', this)" class="active">Calculadora Munição</button>
+      <button onclick="showTab('calc2', this)">Calculadora Reciclável</button>
+    </div>
 
-<label for="preco">Preço de venda por munição (R$):</label>
-<input type="number" id="preco" value="10" step="0.01" min="0">
+    <div id="calc1" class="content active">
+      <label for="tipo">Tipo de munição:</label>
+      <div class="wheel-selector" id="tipo-selector">
+        <button data-tipo="fusil" class="tipo-btn active">Fuzil</button>
+        <button data-tipo="pistola" class="tipo-btn">Pistola</button>
+        <button data-tipo="sub" class="tipo-btn">Sub</button>
+        <button data-tipo="metra" class="tipo-btn">Metra</button>
+      </div>
 
-<div class="result" id="resultado"></div>
+      <label for="quantidade">Quantidade de munições (múltiplos de 10):</label>
+      <input type="number" id="quantidade" value="1000" step="10" min="10">
 
-<footer>Criado por Kauã</footer>
+      <label for="preco">Preço de venda por munição (R$):</label>
+      <input type="number" id="preco" value="10" step="0.01" min="0">
 
-  </div>  <script>
-    const tipos = {
-      fuzil: { lote: 10, sucata: 10, aco: 10, vidro: 5, aluminio: 5 },
-      sub: { lote: 10, sucata: 10, aco: 5, aluminio: 5 },
-      pistola: { lote: 10, aco: 5, aluminio: 5 },
-      metralhadora: { lote: 10, sucata: 15, vidro: 10, aco: 10, aluminio: 10 }
+      <div class="result" id="resultado1"></div>
+    </div>
+
+    <div id="calc2" class="content">
+      <label for="reciclavel">Quantidade de matéria reciclável:</label>
+      <input type="number" id="reciclavel" value="6000" step="1" min="0">
+      <div class="result" id="resultado2"></div>
+    </div>
+
+    <footer>Criado por Kauã</footer>
+  </div>
+
+  <script>
+    function showTab(id, el) {
+      document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      el.classList.add('active');
+    }
+
+    const insumosPorTipo = {
+      fusil: { sucata: 10, aco: 10, vidro: 5, aluminio: 5 },
+      pistola: { sucata: 0, aco: 5, vidro: 0, aluminio: 5 },
+      sub: { sucata: 10, aco: 5, vidro: 0, aluminio: 5 },
+      metra: { sucata: 15, aco: 10, vidro: 10, aluminio: 10 }
     };
 
-    let tipoSelecionado = 'fuzil';
+    let tipoSelecionado = "fusil";
 
-    document.querySelectorAll('.weapon-icon').forEach(icon => {
-      icon.addEventListener('click', () => {
-        document.querySelectorAll('.weapon-icon').forEach(i => i.classList.remove('active'));
-        icon.classList.add('active');
-        tipoSelecionado = icon.dataset.type;
-        calcular();
+    document.querySelectorAll('.tipo-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tipoSelecionado = btn.getAttribute('data-tipo');
+        calcularPrimeira();
       });
     });
 
-    function calcular() {
+    function calcularPrimeira() {
       const qtd = parseInt(document.getElementById("quantidade").value);
       const preco = parseFloat(document.getElementById("preco").value);
-      const res = document.getElementById("resultado");
-
+      const res = document.getElementById("resultado1");
       if (qtd < 10 || qtd % 10 !== 0) {
         res.innerHTML = "<strong>Use múltiplos de 10 (ex: 10, 20, 30...)</strong>";
         return;
       }
 
-      const tipo = tipos[tipoSelecionado];
-      const lotes = qtd / tipo.lote;
-      let output = <p><strong>${qtd} munições (${tipoSelecionado}):</strong></p>;
+      const lotes = qtd / 10;
+      const insumos = insumosPorTipo[tipoSelecionado];
 
-      let reciclaveis = 0;
-      for (let mat in tipo) {
-        if (mat !== 'lote') {
-          const total = tipo[mat] * lotes;
-          output += <p>${mat.charAt(0).toUpperCase() + mat.slice(1)}: ${total}</p>;
-          reciclaveis += total;
-        }
-      }
-
+      const sucata = lotes * insumos.sucata;
+      const aco = lotes * insumos.aco;
+      const vidro = lotes * insumos.vidro;
+      const aluminio = lotes * insumos.aluminio;
+      const reciclavel = (sucata + aco + vidro + aluminio) * 2;
       const lucro = qtd * preco;
-      output += <p>Total recicláveis: ${reciclaveis}</p>;
-      output += <p>Faturamento: R$ ${lucro.toFixed(2)}</p>;
 
-      res.innerHTML = output;
+      let html = `<p><strong>${qtd} munições (${tipoSelecionado}):</strong></p>`;
+      if (sucata > 0) html += `<p>Sucatas: ${sucata}</p>`;
+      if (aco > 0) html += `<p>Aços: ${aco}</p>`;
+      if (vidro > 0) html += `<p>Vidros: ${vidro}</p>`;
+      if (aluminio > 0) html += `<p>Alumínios: ${aluminio}</p>`;
+      html += `<p>Total recicláveis: ${reciclavel}</p>`;
+      html += `<p>Faturamento: R$ ${lucro.toFixed(2)}</p>`;
+
+      res.innerHTML = html;
     }
 
-    document.getElementById("quantidade").addEventListener("input", calcular);
-    document.getElementById("preco").addEventListener("input", calcular);
-    calcular();
-  </script></body>
+    function calcularSegunda() {
+      const reciclavel = parseInt(document.getElementById("reciclavel").value);
+      const res = document.getElementById("resultado2");
+
+      const materiais = Math.floor(reciclavel / 2);
+      const lotes = Math.floor(materiais / 10);
+      const municoes = lotes * 10;
+
+      res.innerHTML = `
+        <p><strong>Com ${reciclavel} recicláveis:</strong></p>
+        <p>- ${materiais} Sucatas</p>
+        <p>- ${materiais} Aços</p>
+        <p>- ${materiais} Vidros</p>
+        <p>- ${materiais} Alumínios</p>
+        <p>Lotes possíveis: ${lotes}</p>
+        <p>Total de munições: ${municoes}</p>
+      `;
+    }
+
+    document.getElementById("quantidade").addEventListener("input", calcularPrimeira);
+    document.getElementById("preco").addEventListener("input", calcularPrimeira);
+    document.getElementById("reciclavel").addEventListener("input", calcularSegunda);
+
+    calcularPrimeira();
+    calcularSegunda();
+  </script>
+</body>
 </html>
