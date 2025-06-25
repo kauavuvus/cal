@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Defensor da Rede</title>
+<style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+    }
+    .title {
+      font-size: 2.2em;
+      margin-bottom: 20px;
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 20px;
+      font-size: 1.2em;
+    }
+    .game-area {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      border: 2px solid #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    .enemy {
+      position: absolute;
+      top: 0;
+      width: 50px;
+      height: 50px;
+      background-size: cover;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(60vh);
+      }
+    }
+    .buttons {
+      margin-top: 15px;
+    }
+    button {
+      background-color: #ff6600;
+      border: none;
+      padding: 12px 24px;
+      margin: 8px 10px;
+      font-size: 1em;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #e65c00;
+    }
+    .quiz-modal, .end-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #111827;
+      color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      z-index: 10;
+      width: 90%;
+      max-width: 400px;
+      display: none;
+      border: 2px solid #1f2937;
+    }
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 5;
+      display: none;
+    }
+    .result-title {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    .result-item {
+      font-size: 1.2em;
+      margin: 8px 0;
+    }
+  
+.quiz-modal button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1em;
+  transition: background 0.3s;
+}
+.quiz-modal button:hover {
+  background-color: #e65c00;
+}
+
+
+.score-board {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.score-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  text-align: center;
+  min-width: 90px;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.1);
+}
+.score-item span {
+  display: block;
+  font-weight: bold;
+  margin-top: 4px;
+  font-size: 20px;
+}
+
+</style>
+<script>const perguntas = [
+  {
+    "pergunta": "Qual tipo de antivírus atua monitorando ações do sistema em tempo real?",
+    "opcoes": [
+      "Preventivo",
+      "Identificador",
+      "Descontaminador"
+    ],
+    "resposta": "Preventivo"
+  },
+  {
+    "pergunta": "Qual prática ajuda a evitar infecção por malware?",
+    "opcoes": [
+      "Usar redes Wi-Fi públicas",
+      "Não atualizar o antivírus",
+      "Baixar apps de sites confiáveis"
+    ],
+    "resposta": "Baixar apps de sites confiáveis"
+  },
+  {
+    "pergunta": "O que o firewall faz?",
+    "opcoes": [
+      "Bloqueia acessos não autorizados",
+      "Aumenta o desempenho do sistema",
+      "Armazena arquivos em cache"
+    ],
+    "resposta": "Bloqueia acessos não autorizados"
+  },
+  {
+    "pergunta": "Qual arquitetura de firewall usa uma DMZ para isolar a rede interna?",
+    "opcoes": [
+      "Dual-Homed Host",
+      "Screened Host",
+      "Screened Subnet"
+    ],
+    "resposta": "Screened Subnet"
+  },
+  {
+    "pergunta": "O que o proxy faz?",
+    "opcoes": [
+      "Remove vírus automaticamente",
+      "Atua como intermediário entre usuário e internet",
+      "Aumenta o uso de rede"
+    ],
+    "resposta": "Atua como intermediário entre usuário e internet"
+  },
+  {
+    "pergunta": "Qual ferramenta oferece proteção em tempo real contra malware?",
+    "opcoes": [
+      "Bitdefender",
+      "Bluetooth",
+      "HTTP"
+    ],
+    "resposta": "Bitdefender"
+  },
+  {
+    "pergunta": "Qual dessas é uma boa prática de segurança?",
+    "opcoes": [
+      "Desativar antivírus ao usar a internet",
+      "Usar várias ferramentas antivírus ao mesmo tempo",
+      "Configurar proteção em tempo real"
+    ],
+    "resposta": "Configurar proteção em tempo real"
+  },
+  {
+    "pergunta": "SIEM é utilizado para:",
+    "opcoes": [
+      "Armazenar senhas",
+      "Coletar e analisar eventos de segurança",
+      "Compartilhar arquivos"
+    ],
+    "resposta": "Coletar e analisar eventos de segurança"
+  },
+  {
+    "pergunta": "O que significa EDR?",
+    "opcoes": [
+      "Endpoint Detection and Response",
+      "Email Data Recovery",
+      "Encrypted Data Report"
+    ],
+    "resposta": "Endpoint Detection and Response"
+  },
+  {
+    "pergunta": "Qual dos itens abaixo NÃO é uma ameaça digital?",
+    "opcoes": [
+      "Phishing",
+      "Ransomware",
+      "Firewall"
+    ],
+    "resposta": "Firewall"
+  },
+  {
+    "pergunta": "O que é necessário para um antivírus funcionar corretamente?",
+    "opcoes": [
+      "Manter atualizado",
+      "Desligar o firewall",
+      "Desativar internet"
+    ],
+    "resposta": "Manter atualizado"
+  },
+  {
+    "pergunta": "O que pode indicar que um sistema foi infectado por malware?",
+    "opcoes": [
+      "Desempenho estável",
+      "Abertura rápida de programas",
+      "Comportamentos anormais no sistema"
+    ],
+    "resposta": "Comportamentos anormais no sistema"
+  },
+  {
+    "pergunta": "Firewalls podem ser classificados em:",
+    "opcoes": [
+      "Físico e Lógico",
+      "Analógico e Digital",
+      "Interno e Externo"
+    ],
+    "resposta": "Físico e Lógico"
+  },
+  {
+    "pergunta": "O que um firewall de filtragem de pacotes faz?",
+    "opcoes": [
+      "Análise de conteúdo",
+      "Bloqueia ou permite tráfego com base em regras",
+      "Criptografa dados"
+    ],
+    "resposta": "Bloqueia ou permite tráfego com base em regras"
+  },
+  {
+    "pergunta": "Proxy transparente é:",
+    "opcoes": [
+      "Detectável pelo usuário",
+      "Necessita configuração no cliente",
+      "Invisível ao usuário"
+    ],
+    "resposta": "Invisível ao usuário"
+  },
+  {
+    "pergunta": "Qual é a principal função do firewall na segurança de redes?",
+    "opcoes": [
+      "Melhorar velocidade",
+      "Filtrar e controlar tráfego de rede",
+      "Instalar software"
+    ],
+    "resposta": "Filtrar e controlar tráfego de rede"
+  },
+  {
+    "pergunta": "Antivírus identificador faz:",
+    "opcoes": [
+      "Detecta vírus já existentes",
+      "Previne novas ameaças",
+      "Atualiza sistema operacional"
+    ],
+    "resposta": "Detecta vírus já existentes"
+  },
+  {
+    "pergunta": "Proxy reverso é usado para:",
+    "opcoes": [
+      "Proteger servidores",
+      "Ocultar usuário",
+      "Compartilhar arquivos locais"
+    ],
+    "resposta": "Proteger servidores"
+  },
+  {
+    "pergunta": "Quais são sinais comuns de infecção por vírus?",
+    "opcoes": [
+      "Sistema mais rápido",
+      "Pop-ups constantes",
+      "Melhoria na navegação"
+    ],
+    "resposta": "Pop-ups constantes"
+  },
+  {
+    "pergunta": "Qual é a melhor forma de manter o antivírus eficaz?",
+    "opcoes": [
+      "Ignorar atualizações",
+      "Atualizar regularmente",
+      "Desativar a proteção"
+    ],
+    "resposta": "Atualizar regularmente"
+  }
+];</script></head>
+<body><div id="startCard" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,32,39,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999;">
+<div style="background:#1f2937;padding:40px;border-radius:20px;box-shadow:0 0 20px rgba(0,0,0,0.5);text-align:center;width:90%;max-width:360px;">
+<h2 style="color:#fff;margin-bottom:20px;">Bem-vindo ao Defensor da Rede</h2>
+<button onclick="startGame()" style="padding:14px 30px;font-size:1.1em;background:#22c55e;border:none;border-radius:10px;color:#fff;cursor:pointer;">Iniciar Jogo</button>
+</div>
+</div>
+<div class="container">
+<div class="title">Defensor da Rede</div>
+<div class="score-board">
+<div class="score-item">
+<div style="color: yellow;">Pontuação</div>
+<span id="score">0</span>
+</div>
+<div class="score-item">
+<div style="color: yellow;">Bloqueados</div>
+<span id="blocked">0</span>
+</div>
+<div class="score-item">
+<div style="color: yellow;">Erros</div>
+<span id="errors">0</span>
+</div>
+</div>
+</div>
+<div class="game-area" id="gameArea"></div>
+<div class="buttons">
+<button onclick="choose('antivirus')">Usar Antivírus</button>
+<button onclick="choose('firewall')">Configurar Firewall</button>
+</div>
+<div class="modal-backdrop" id="backdrop"></div>
+<div class="quiz-modal" id="quizModal">
+<div id="quizQuestion" style="margin-bottom: 10px;"></div>
+<div id="quizOptions"></div>
+</div>
+<div class="end-modal" id="endModal">
+<div class="result-title">Fim de Jogo</div>
+<div class="result-item">Pontuação Final: <span id="finalScore"></span></div>
+<div class="result-item">Ameaças Bloqueadas: <span id="finalBlocked"></span></div>
+<div class="result-item">Erros Cometidos: <span id="finalErrors"></span></div>
+<button onclick="location.reload()">Jogar Novamente</button>
+</div>
+<script>
+    let score = 0, blocked = 0, errors = 0, speed = 3000;
+    let active = true, paused = false;
+    let round = 0;
+
+    const questions = [
+  {q: "Qual tipo de antivírus atua monitorando ações do sistema em tempo real?", options: ["Preventivo", "Identificador", "Descontaminador"], a: 0},
+  {q: "Qual prática ajuda a evitar infecção por malware?", options: ["Usar redes Wi-Fi públicas", "Não atualizar o antivírus", "Baixar apps de sites confiáveis"], a: 2},
+  {q: "O que o firewall faz?", options: ["Bloqueia acessos não autorizados", "Aumenta o desempenho do sistema", "Armazena arquivos em cache"], a: 0},
+  {q: "Qual arquitetura de firewall usa uma DMZ para isolar a rede interna?", options: ["Dual-Homed Host", "Screened Host", "Screened Subnet"], a: 2},
+  {q: "O que o proxy faz?", options: ["Remove vírus automaticamente", "Atua como intermediário entre usuário e internet", "Aumenta o uso de rede"], a: 1},
+  {q: "Qual ferramenta oferece proteção em tempo real contra malware?", options: ["Bitdefender", "Bluetooth", "HTTP"], a: 0},
+  {q: "Qual dessas é uma boa prática de segurança?", options: ["Desativar antivírus ao usar a internet", "Usar várias ferramentas antivírus ao mesmo tempo", "Configurar proteção em tempo real"], a: 2},
+  {q: "SIEM é utilizado para:", options: ["Armazenar senhas", "Coletar e analisar eventos de segurança", "Compartilhar arquivos"], a: 1},
+  {q: "O que significa EDR?", options: ["Endpoint Detection and Response", "Email Data Recovery", "Encrypted Data Report"], a: 0},
+  {q: "Qual dos itens abaixo NÃO é uma ameaça digital?", options: ["Phishing", "Ransomware", "Firewall"], a: 2},
+  {q: "O que é necessário para um antivírus funcionar corretamente?", options: ["Manter atualizado", "Desligar o firewall", "Desativar internet"], a: 0},
+  {q: "O que pode indicar que um sistema foi infectado por malware?", options: ["Desempenho estável", "Abertura rápida de programas", "Comportamentos anormais no sistema"], a: 2},
+  {q: "Firewalls podem ser classificados em:", options: ["Físico e Lógico", "Analógico e Digital", "Interno e Externo"], a: 0},
+  {q: "O que um firewall de filtragem de pacotes faz?", options: ["Análise de conteúdo", "Bloqueia ou permite tráfego com base em regras", "Criptografa dados"], a: 1},
+  {q: "Proxy transparente é:", options: ["Detectável pelo usuário", "Necessita configuração no cliente", "Invisível ao usuário"], a: 2},
+  {q: "Qual é a principal função do firewall na segurança de redes?", options: ["Melhorar velocidade", "Filtrar e controlar tráfego de rede", "Instalar software"], a: 1},
+  {q: "Antivírus identificador faz:", options: ["Detecta vírus já existentes", "Previne novas ameaças", "Atualiza sistema operacional"], a: 0},
+  {q: "Proxy reverso é usado para:", options: ["Proteger servidores", "Ocultar usuário", "Compartilhar arquivos locais"], a: 0},
+  {q: "Quais são sinais comuns de infecção por vírus?", options: ["Sistema mais rápido", "Pop-ups constantes", "Melhoria na navegação"], a: 1},
+  {q: "Qual é a melhor forma de manter o antivírus eficaz?", options: ["Ignorar atualizações", "Atualizar regularmente", "Desativar a proteção"], a: 1}
+];
+
+    function startEnemy(gameTime = 0) {
+  if (paused) return;
+      if (!active || paused) return;
+      if (errors >= 1 || round >= 100) return endGame();
+      round++;
+      const gameArea = document.getElementById("gameArea");
+      const enemy = document.createElement("div");
+      const type = Math.random() < 0.5 ? "virus" : "hacker";
+      enemy.className = "enemy";
+      enemy.dataset.type = type;
+      enemy.style.left = Math.random() * (gameArea.clientWidth - 60) + "px";
+      enemy.style.backgroundImage = type === "virus"
+        ? "url('https://cdn-icons-png.flaticon.com/512/10091/10091984.png')"
+        : "url('https://cdn-icons-png.flaticon.com/512/6919/6919797.png')";
+      enemy.style.animationDuration = speed + "ms";
+      gameArea.appendChild(enemy);
+
+      enemy.onclick = () => {
+        if (!active || paused) return;
+        score += 10;
+        blocked++;
+        enemy.remove();
+        updateStats();
+        if (blocked % 10 === 0) {
+          paused = true;
+          showQuiz();
+        } else {
+          if (blocked % 5 === 1 && speed > 800) speed *= 0.95;
+          startEnemy();
+        }
+      };
+
+      setTimeout(() => {
+        if (!paused && gameArea.contains(enemy)) {
+          enemy.remove();
+          errors++;
+          updateStats();
+          endGame();
+        }
+      }, speed);
+    }
+
+    function choose(tool) {
+      // Desativado para nova lógica
+    }
+
+    function showQuiz() {
+      const q = questions[Math.floor(Math.random() * questions.length)];
+      document.getElementById("quizQuestion").innerText = q.q;
+      const options = document.getElementById("quizOptions");
+      options.innerHTML = "";
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => {
+          if (i === q.a) {
+            score += 20;
+          } else {
+            errors++;
+          }
+          updateStats();
+          hideQuiz();
+        };
+        options.appendChild(btn);
+      });
+      document.getElementById("quizModal").style.display = "block";
+      document.getElementById("backdrop").style.display = "block";
+    }
+
+    function hideQuiz() {
+      paused = false;
+      document.getElementById("quizModal").style.display = "none";
+      document.getElementById("backdrop").style.display = "none";
+      startEnemy();
+    }
+
+    
+let gameEnded = false;
+function endGame() {
+  if (gameEnded) return;
+  gameEnded = true;
+
+      active = false;
+      document.getElementById("finalScore").innerText = score;
+      document.getElementById("finalBlocked").innerText = blocked;
+      document.getElementById("finalErrors").innerText = errors;
+      document.getElementById("endModal").style.display = "block";
+      document.getElementById("backdrop").style.display = "block";
+    }
+
+    function updateStats() {
+      document.getElementById("score").innerText = score;
+      document.getElementById("blocked").innerText = blocked;
+      document.getElementById("errors").innerText = errors;
+    }
+
+    window.onload = () => {
+  //    startEnemy();
+    };
+  
+
+function startGame() {
+  document.getElementById('startCard').style.display = 'none';
+  for (let i = 0; i < Math.min(1 + Math.floor(blocked / 10), 5); i++) {
+    setTimeout(startEnemy, i * 500);
+  }
+}
+
+
+// Parâmetros de dificuldade
+let gameTime = 0;
+let gameInterval;
+
+function startGame() {
+  document.getElementById('startCard').style.display = 'none';
+  gameTime = 0;
+
+  gameInterval = setInterval(() => {
+    gameTime++;
+
+    // Define o número de inimigos simultâneos
+    let numInimigos = Math.min(1 + Math.floor(gameTime / 5), 6); // até 6 inimigos com o tempo
+
+    for (let i = 0; i < numInimigos; i++) {
+      setTimeout(() => startEnemy(gameTime), i * 150);
+    }
+
+  }, 2000); // a cada 2 segundos, lança nova leva de ameaças
+}
+
+// Modificar a função startEnemy para considerar gameTime como parâmetro
+</script>
+<script>let enemyTimeouts = [];
+
+// === Patch: Proper pause during Quiz ===
+let gameInterval = null;
+
+// Override startGame with single clear logic
+function startGame() {
+  document.getElementById('startCard').style.display = 'none';
+  score = 0; blocked = 0; errors = 0; gameTime = 0;
+  updateStats();
+  launchWaves();
+}
+
+function launchWaves(){
+  if(gameInterval) clearInterval(gameInterval);
+  gameInterval = setInterval(()=> {
+    if(paused) return;
+     if(paused) return;            // don't spawn while paused
+     gameTime++;
+     let num = Math.min(1 + Math.floor(gameTime/5), 6);
+     for(let i=0;i<num;i++){
+        enemyTimeouts.push(setTimeout(()=>startEnemy(gameTime), i*150));
+     }
+  }, 2000);
+}
+
+// Pause/resume all current enemies animations
+function setEnemyAnimations(state){
+  document.querySelectorAll('.enemy').forEach(el=> el.style.animationPlayState = state);
+}
+
+// Modify showQuiz and hideQuiz
+function showQuiz(){
+  paused = true;
+  setEnemyAnimations('paused');     // freeze enemies
+  const q = questions[Math.floor(Math.random()*questions.length)];
+  const qEl = document.getElementById('quizQuestion');
+  const opts = document.getElementById('quizOptions');
+  qEl.textContent = q.q;
+  opts.innerHTML = '';
+  q.options.forEach((opt,i)=>{
+     const b = document.createElement('button');
+     b.textContent = opt;
+     b.onclick = ()=> {
+        if(i===q.a){ score+=20; } else { errors++; }
+        updateStats();
+        hideQuiz();
+     };
+     opts.appendChild(b);
+  });
+  document.getElementById('quizModal').style.display='block';
+  document.getElementById('backdrop').style.display='block';
+}
+
+function hideQuiz(){
+  document.getElementById('quizModal').style.display='none';
+  document.getElementById('backdrop').style.display='none';
+  paused = false;
+  setEnemyAnimations('running');    // resume enemies
+}
+
+// Ensure no enemy waves before startGame click
+window.onload = ()=>{};
+</script></body>
+</html>
