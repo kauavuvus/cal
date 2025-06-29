@@ -1,598 +1,218 @@
-<!DOCTYPE html>
-
-<html lang="pt-br">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Defensor da Rede</title>
-<style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    body {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      overflow: hidden;
-    }
-    .container {
-      text-align: center;
-      padding: 20px;
-    }
-    .title {
-      font-size: 2.2em;
-      margin-bottom: 20px;
-    }
-    .scoreboard {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 20px;
-      font-size: 1.2em;
-    }
-    .game-area {
-      position: relative;
-      width: 100%;
-      height: 60vh;
-      border: 2px solid #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      background-color: rgba(0, 0, 0, 0.2);
-    }
-    .enemy {
-      position: absolute;
-      top: 0;
-      width: 50px;
-      height: 50px;
-      background-size: cover;
-      animation: fall linear forwards;
-    }
-    @keyframes fall {
-      to {
-        transform: translateY(60vh);
-      }
-    }
-    .buttons {
-      margin-top: 15px;
-    }
-    button {
-      background-color: #ff6600;
-      border: none;
-      padding: 12px 24px;
-      margin: 8px 10px;
-      font-size: 1em;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #e65c00;
-    }
-    .quiz-modal, .end-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #111827;
-      color: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      z-index: 10;
-      width: 90%;
-      max-width: 400px;
-      display: none;
-      border: 2px solid #1f2937;
-    }
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 5;
-      display: none;
-    }
-    .result-title {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-    }
-    .result-item {
-      font-size: 1.2em;
-      margin: 8px 0;
-    }
-  
-.quiz-modal button {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  margin: 6px 0;
-  background-color: #ff6600;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 1em;
-  transition: background 0.3s;
-}
-.quiz-modal button:hover {
-  background-color: #e65c00;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Defensor da Rede</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@400;600;700&display=swap');*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#001b3d;color:#fff;font-family:'Poppins',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;text-align:center}
+#game{max-width:720px;width:100%;background:#002a62;padding:32px;border-radius:18px;box-shadow:0 8px 25px rgba(0,0,0,.8);animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
+h1{font-family:'Orbitron',sans-serif;margin-bottom:35px;font-weight:900;font-size:3rem;color:#ff7f00;user-select:none}
+h2{font-weight:700;letter-spacing:.5px;margin-bottom:18px}
+button{background:#ff7f00;border:none;border-radius:28px;padding:15px 35px;font-size:1.15rem;font-weight:600;color:#fff;cursor:pointer;transition:background-color .3s ease,transform .15s ease;user-select:none;margin:10px 6px;min-width:140px}
+button:hover{background:#e36f00;transform:scale(1.05)}
+button:active{transform:scale(.95)}
+button:disabled{filter:grayscale(.7);cursor:not-allowed}
+.hidden{display:none}
 
-.score-board {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 20px 0;
-}
-.score-item {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  text-align: center;
-  min-width: 90px;
-  color: #fff;
-  font-family: 'Segoe UI', sans-serif;
-  box-shadow: inset 0 0 8px rgba(255,255,255,0.1);
-}
-.score-item span {
-  display: block;
-  font-weight: bold;
-  margin-top: 4px;
-  font-size: 20px;
-}
+/* Quiz */
+.quiz-options{margin-top:22px;display:flex;flex-direction:column;align-items:center}
+.quiz-options button{width:100%;max-width:340px;margin:8px 0}
+.question-box{background:#003b80;padding:22px;border-radius:15px;box-shadow:0 5px 18px rgba(0,0,0,.45);font-size:1.2rem;min-height:90px;user-select:none}
 
-</style>
-<script>const perguntas = [
-  {
-    "pergunta": "Qual tipo de antivírus atua monitorando ações do sistema em tempo real?",
-    "opcoes": [
-      "Preventivo",
-      "Identificador",
-      "Descontaminador"
-    ],
-    "resposta": "Preventivo"
-  },
-  {
-    "pergunta": "Qual prática ajuda a evitar infecção por malware?",
-    "opcoes": [
-      "Usar redes Wi-Fi públicas",
-      "Não atualizar o antivírus",
-      "Baixar apps de sites confiáveis"
-    ],
-    "resposta": "Baixar apps de sites confiáveis"
-  },
-  {
-    "pergunta": "O que o firewall faz?",
-    "opcoes": [
-      "Bloqueia acessos não autorizados",
-      "Aumenta o desempenho do sistema",
-      "Armazena arquivos em cache"
-    ],
-    "resposta": "Bloqueia acessos não autorizados"
-  },
-  {
-    "pergunta": "Qual arquitetura de firewall usa uma DMZ para isolar a rede interna?",
-    "opcoes": [
-      "Dual-Homed Host",
-      "Screened Host",
-      "Screened Subnet"
-    ],
-    "resposta": "Screened Subnet"
-  },
-  {
-    "pergunta": "O que o proxy faz?",
-    "opcoes": [
-      "Remove vírus automaticamente",
-      "Atua como intermediário entre usuário e internet",
-      "Aumenta o uso de rede"
-    ],
-    "resposta": "Atua como intermediário entre usuário e internet"
-  },
-  {
-    "pergunta": "Qual ferramenta oferece proteção em tempo real contra malware?",
-    "opcoes": [
-      "Bitdefender",
-      "Bluetooth",
-      "HTTP"
-    ],
-    "resposta": "Bitdefender"
-  },
-  {
-    "pergunta": "Qual dessas é uma boa prática de segurança?",
-    "opcoes": [
-      "Desativar antivírus ao usar a internet",
-      "Usar várias ferramentas antivírus ao mesmo tempo",
-      "Configurar proteção em tempo real"
-    ],
-    "resposta": "Configurar proteção em tempo real"
-  },
-  {
-    "pergunta": "SIEM é utilizado para:",
-    "opcoes": [
-      "Armazenar senhas",
-      "Coletar e analisar eventos de segurança",
-      "Compartilhar arquivos"
-    ],
-    "resposta": "Coletar e analisar eventos de segurança"
-  },
-  {
-    "pergunta": "O que significa EDR?",
-    "opcoes": [
-      "Endpoint Detection and Response",
-      "Email Data Recovery",
-      "Encrypted Data Report"
-    ],
-    "resposta": "Endpoint Detection and Response"
-  },
-  {
-    "pergunta": "Qual dos itens abaixo NÃO é uma ameaça digital?",
-    "opcoes": [
-      "Phishing",
-      "Ransomware",
-      "Firewall"
-    ],
-    "resposta": "Firewall"
-  },
-  {
-    "pergunta": "O que é necessário para um antivírus funcionar corretamente?",
-    "opcoes": [
-      "Manter atualizado",
-      "Desligar o firewall",
-      "Desativar internet"
-    ],
-    "resposta": "Manter atualizado"
-  },
-  {
-    "pergunta": "O que pode indicar que um sistema foi infectado por malware?",
-    "opcoes": [
-      "Desempenho estável",
-      "Abertura rápida de programas",
-      "Comportamentos anormais no sistema"
-    ],
-    "resposta": "Comportamentos anormais no sistema"
-  },
-  {
-    "pergunta": "Firewalls podem ser classificados em:",
-    "opcoes": [
-      "Físico e Lógico",
-      "Analógico e Digital",
-      "Interno e Externo"
-    ],
-    "resposta": "Físico e Lógico"
-  },
-  {
-    "pergunta": "O que um firewall de filtragem de pacotes faz?",
-    "opcoes": [
-      "Análise de conteúdo",
-      "Bloqueia ou permite tráfego com base em regras",
-      "Criptografa dados"
-    ],
-    "resposta": "Bloqueia ou permite tráfego com base em regras"
-  },
-  {
-    "pergunta": "Proxy transparente é:",
-    "opcoes": [
-      "Detectável pelo usuário",
-      "Necessita configuração no cliente",
-      "Invisível ao usuário"
-    ],
-    "resposta": "Invisível ao usuário"
-  },
-  {
-    "pergunta": "Qual é a principal função do firewall na segurança de redes?",
-    "opcoes": [
-      "Melhorar velocidade",
-      "Filtrar e controlar tráfego de rede",
-      "Instalar software"
-    ],
-    "resposta": "Filtrar e controlar tráfego de rede"
-  },
-  {
-    "pergunta": "Antivírus identificador faz:",
-    "opcoes": [
-      "Detecta vírus já existentes",
-      "Previne novas ameaças",
-      "Atualiza sistema operacional"
-    ],
-    "resposta": "Detecta vírus já existentes"
-  },
-  {
-    "pergunta": "Proxy reverso é usado para:",
-    "opcoes": [
-      "Proteger servidores",
-      "Ocultar usuário",
-      "Compartilhar arquivos locais"
-    ],
-    "resposta": "Proteger servidores"
-  },
-  {
-    "pergunta": "Quais são sinais comuns de infecção por vírus?",
-    "opcoes": [
-      "Sistema mais rápido",
-      "Pop-ups constantes",
-      "Melhoria na navegação"
-    ],
-    "resposta": "Pop-ups constantes"
-  },
-  {
-    "pergunta": "Qual é a melhor forma de manter o antivírus eficaz?",
-    "opcoes": [
-      "Ignorar atualizações",
-      "Atualizar regularmente",
-      "Desativar a proteção"
-    ],
-    "resposta": "Atualizar regularmente"
-  }
-];</script></head>
-<body><div id="startCard" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,32,39,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999;">
-<div style="background:#1f2937;padding:40px;border-radius:20px;box-shadow:0 0 20px rgba(0,0,0,0.5);text-align:center;width:90%;max-width:360px;">
-<h2 style="color:#fff;margin-bottom:20px;">Bem-vindo ao Defensor da Rede</h2>
-<button onclick="startGame()" style="padding:14px 30px;font-size:1.1em;background:#22c55e;border:none;border-radius:10px;color:#fff;cursor:pointer;">Iniciar Jogo</button>
+/* Reação Rápida */
+#reaction-button{font-size:1.6rem;font-weight:700;padding:22px 48px;border-radius:38px;border:none;color:#fff;cursor:pointer;user-select:none;transition:background-color .4s ease,transform .15s ease}
+
+/* Memória Visual */
+#memory-sequence{display:flex;justify-content:center;gap:22px;margin-bottom:18px;user-select:none;flex-wrap:wrap}
+.memory-icon{width:68px;height:68px;background:#ff7f00;border-radius:14px;display:flex;justify-content:center;align-items:center;font-size:2.2rem;color:#fff;cursor:default}
+
+#memory-drop-area{display:flex;flex-direction:column;align-items:center;gap:18px}
+#memory-slots,#memory-icons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+.drop-slot{width:68px;height:70px;border:2px dashed #ff7f00;border-radius:12px;color:#ff7f00;font-weight:700;font-size:2rem;display:flex;align-items:center;justify-content:center}
+.drag-emoji{width:68px;height:68px;background:#ff7f00;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;cursor:grab;user-select:none}
+.drag-emoji:active{cursor:grabbing}
+
+/* Cadeado Seguro */
+#cadeado-container{display:flex;justify-content:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.cadeado-letter{background:#ff7f00;color:#fff;font-weight:700;font-size:1.6rem;padding:15px 22px;border-radius:14px;cursor:grab;user-select:none;transition:background .3s ease}
+.cadeado-letter:active{cursor:grabbing}
+
+#cadeado-drop-area{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+
+/* Arraste o Correto */
+#drag-container{display:flex;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-top:24px;user-select:none}
+.drag-items,.drop-area{background:#003b80;padding:18px;border-radius:15px;box-shadow:0 5px 18px rgba(0,0,0,.45);flex:1 1 45%;min-height:160px}
+.drag-items{display:flex;flex-wrap:wrap;gap:15px;justify-content:center}
+.drag-item{background:#ff7f00;color:#fff;padding:10px 15px;border-radius:14px;cursor:grab;user-select:none;font-weight:600;min-width:110px;text-align:center}
+.drag-item:active{cursor:grabbing}
+.drop-area{border:2px dashed #ff7f00;color:#ff7f00;font-weight:600;font-size:1.15rem;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px}
+.drop-area .drop-item{background:#ff7f00;color:#fff;border-radius:12px;padding:8px 12px;margin:6px 0;min-width:100px}
+
+#final-message{font-size:1.9rem;font-weight:700;margin-top:32px}
+
+@media(max-width:480px){h1{font-size:2.2rem}#reaction-button{font-size:1.3rem;padding:18px 32px}button{font-size:1rem;padding:12px 28px}}
+
+  </style>
+</head>
+<body>
+  <div id="game">
+    <!-- Tela inicial -->
+    <div id="start-screen">
+      <h1>🛡️ Defensor da Rede</h1>
+      <button id="start-btn">Iniciar</button>
+    </div><!-- Reação Rápida -->
+<div id="minigame-1" class="hidden">
+  <h2>Reação Rápida</h2>
+  <p>O botão muda de cor constantemente. Clique em <strong>DESATIVAR</strong> somente quando ele estiver <span style="color:#00aa00;font-weight:700">verde</span>.</p>
+  <button id="reaction-button">DESATIVAR</button>
 </div>
+
+<!-- Quiz 1 -->
+<div id="quiz-block-1" class="hidden">
+  <h2>Quiz 1: Antivírus e Firewall</h2>
+  <div class="question-box"></div><div class="quiz-options"></div>
 </div>
-<div class="container">
-<div class="title">Defensor da Rede</div>
-<div class="score-board">
-<div class="score-item">
-<div style="color: yellow;">Pontuação</div>
-<span id="score">0</span>
+
+<!-- Memória Visual -->
+<div id="minigame-2" class="hidden">
+  <h2>Memória Visual</h2>
+  <p>Memorize a sequência de emojis. Depois arraste-os para os espaços na mesma ordem.</p>
+  <div id="memory-sequence"></div>
+  <div id="memory-drop-area" class="hidden">
+    <div id="memory-slots"></div>
+    <div id="memory-icons"></div>
+  </div>
 </div>
-<div class="score-item">
-<div style="color: yellow;">Bloqueados</div>
-<span id="blocked">0</span>
+
+<!-- Quiz 2 -->
+<div id="quiz-block-2" class="hidden">
+  <h2>Quiz 2: Boas práticas e ferramentas</h2>
+  <div class="question-box"></div><div class="quiz-options"></div>
 </div>
-<div class="score-item">
-<div style="color: yellow;">Erros</div>
-<span id="errors">0</span>
+
+<!-- Cadeado Seguro -->
+<div id="minigame-3" class="hidden">
+  <h2>Cadeado Seguro</h2>
+  <p>Arraste as letras para formar <strong>FIREWALL</strong>.</p>
+  <div id="cadeado-container"></div>
+  <div id="cadeado-drop-area"></div>
 </div>
+
+<!-- Quiz 3 -->
+<div id="quiz-block-3" class="hidden">
+  <h2>Quiz 3: Antivírus e Firewalls</h2>
+  <div class="question-box"></div><div class="quiz-options"></div>
 </div>
+
+<!-- Arraste o Correto -->
+<div id="minigame-4" class="hidden">
+  <h2>Arraste o Correto</h2>
+  <p>Arraste os itens para: <strong>Rede Segura</strong> ou <strong>Ameaça</strong>.</p>
+  <div id="drag-container">
+    <div class="drag-items" id="drag-items"></div>
+    <div class="drop-area" id="safe-area"><h3>Rede Segura</h3></div>
+    <div class="drop-area" id="threat-area"><h3>Ameaça</h3></div>
+  </div>
+  <button id="check-drag-btn" style="margin-top:22px">Conferir</button>
 </div>
-<div class="game-area" id="gameArea"></div>
-<div class="buttons">
-<button onclick="choose('antivirus')">Usar Antivírus</button>
-<button onclick="choose('firewall')">Configurar Firewall</button>
+
+<!-- Tela final -->
+<div id="end-screen" class="hidden">
+  <h1 id="final-message"></h1>
+  <button id="restart-btn">Jogar Novamente</button>
 </div>
-<div class="modal-backdrop" id="backdrop"></div>
-<div class="quiz-modal" id="quizModal">
-<div id="quizQuestion" style="margin-bottom: 10px;"></div>
-<div id="quizOptions"></div>
-</div>
-<div class="end-modal" id="endModal">
-<div class="result-title">Fim de Jogo</div>
-<div class="result-item">Pontuação Final: <span id="finalScore"></span></div>
-<div class="result-item">Ameaças Bloqueadas: <span id="finalBlocked"></span></div>
-<div class="result-item">Erros Cometidos: <span id="finalErrors"></span></div>
-<button onclick="location.reload()">Jogar Novamente</button>
-</div>
-<script>
-    let score = 0, blocked = 0, errors = 0, speed = 3000;
-    let active = true, paused = false;
-    let round = 0;
 
-    const questions = [
-  {q: "Qual tipo de antivírus atua monitorando ações do sistema em tempo real?", options: ["Preventivo", "Identificador", "Descontaminador"], a: 0},
-  {q: "Qual prática ajuda a evitar infecção por malware?", options: ["Usar redes Wi-Fi públicas", "Não atualizar o antivírus", "Baixar apps de sites confiáveis"], a: 2},
-  {q: "O que o firewall faz?", options: ["Bloqueia acessos não autorizados", "Aumenta o desempenho do sistema", "Armazena arquivos em cache"], a: 0},
-  {q: "Qual arquitetura de firewall usa uma DMZ para isolar a rede interna?", options: ["Dual-Homed Host", "Screened Host", "Screened Subnet"], a: 2},
-  {q: "O que o proxy faz?", options: ["Remove vírus automaticamente", "Atua como intermediário entre usuário e internet", "Aumenta o uso de rede"], a: 1},
-  {q: "Qual ferramenta oferece proteção em tempo real contra malware?", options: ["Bitdefender", "Bluetooth", "HTTP"], a: 0},
-  {q: "Qual dessas é uma boa prática de segurança?", options: ["Desativar antivírus ao usar a internet", "Usar várias ferramentas antivírus ao mesmo tempo", "Configurar proteção em tempo real"], a: 2},
-  {q: "SIEM é utilizado para:", options: ["Armazenar senhas", "Coletar e analisar eventos de segurança", "Compartilhar arquivos"], a: 1},
-  {q: "O que significa EDR?", options: ["Endpoint Detection and Response", "Email Data Recovery", "Encrypted Data Report"], a: 0},
-  {q: "Qual dos itens abaixo NÃO é uma ameaça digital?", options: ["Phishing", "Ransomware", "Firewall"], a: 2},
-  {q: "O que é necessário para um antivírus funcionar corretamente?", options: ["Manter atualizado", "Desligar o firewall", "Desativar internet"], a: 0},
-  {q: "O que pode indicar que um sistema foi infectado por malware?", options: ["Desempenho estável", "Abertura rápida de programas", "Comportamentos anormais no sistema"], a: 2},
-  {q: "Firewalls podem ser classificados em:", options: ["Físico e Lógico", "Analógico e Digital", "Interno e Externo"], a: 0},
-  {q: "O que um firewall de filtragem de pacotes faz?", options: ["Análise de conteúdo", "Bloqueia ou permite tráfego com base em regras", "Criptografa dados"], a: 1},
-  {q: "Proxy transparente é:", options: ["Detectável pelo usuário", "Necessita configuração no cliente", "Invisível ao usuário"], a: 2},
-  {q: "Qual é a principal função do firewall na segurança de redes?", options: ["Melhorar velocidade", "Filtrar e controlar tráfego de rede", "Instalar software"], a: 1},
-  {q: "Antivírus identificador faz:", options: ["Detecta vírus já existentes", "Previne novas ameaças", "Atualiza sistema operacional"], a: 0},
-  {q: "Proxy reverso é usado para:", options: ["Proteger servidores", "Ocultar usuário", "Compartilhar arquivos locais"], a: 0},
-  {q: "Quais são sinais comuns de infecção por vírus?", options: ["Sistema mais rápido", "Pop-ups constantes", "Melhoria na navegação"], a: 1},
-  {q: "Qual é a melhor forma de manter o antivírus eficaz?", options: ["Ignorar atualizações", "Atualizar regularmente", "Desativar a proteção"], a: 1}
-];
+  </div><script>
+/********* UTILS *********/
+const $ = id => document.getElementById(id);
+function hide(...els){els.forEach(el=>el.classList.add('hidden'))}
+function show(el){el.classList.remove('hidden')}
 
-    function startEnemy(gameTime = 0) {
-  if (paused) return;
-      if (!active || paused) return;
-      if (errors >= 1 || round >= 100) return endGame();
-      round++;
-      const gameArea = document.getElementById("gameArea");
-      const enemy = document.createElement("div");
-      const type = Math.random() < 0.5 ? "virus" : "hacker";
-      enemy.className = "enemy";
-      enemy.dataset.type = type;
-      enemy.style.left = Math.random() * (gameArea.clientWidth - 60) + "px";
-      enemy.style.backgroundImage = type === "virus"
-        ? "url('https://cdn-icons-png.flaticon.com/512/10091/10091984.png')"
-        : "url('https://cdn-icons-png.flaticon.com/512/6919/6919797.png')";
-      enemy.style.animationDuration = speed + "ms";
-      gameArea.appendChild(enemy);
+/******* ESTADO GLOBAL ********/
+const state={currentStage:0,totalCorrect:0};
 
-      enemy.onclick = () => {
-        if (!active || paused) return;
-        score += 10;
-        blocked++;
-        enemy.remove();
-        updateStats();
-        if (blocked % 10 === 0) {
-          paused = true;
-          showQuiz();
-        } else {
-          if (blocked % 5 === 1 && speed > 800) speed *= 0.95;
-          startEnemy();
-        }
-      };
+/******* QUIZ DATA ********/
+const quizzes=[[
+  {q:"Qual tipo de antivírus atua monitorando ações do sistema em tempo real?",options:["Preventivo","Detectivo","Reativo"],answer:0},
+  {q:"Qual prática ajuda a evitar infecção por malware?",options:["Usar senhas fracas","Ignorar atualizações","Baixar apps de sites confiáveis"],answer:2},
+  {q:"O que o firewall faz?",options:["Bloqueia acessos não autorizados","Acelera a internet","Protege o hardware"],answer:0},
+  {q:"Qual arquitetura de firewall usa uma DMZ para isolar a rede interna?",options:["Proxy","VPN","Screened Subnet"],answer:2},
+  {q:"O que o proxy faz?",options:["Bloqueia vírus","Intermediário entre usuário e internet","Aumenta a velocidade"],answer:1}
+],[
+  {q:"Qual ferramenta oferece proteção em tempo real contra malware?",options:["Bitdefender","Norton","McAfee"],answer:0},
+  {q:"Qual dessas é uma boa prática de segurança?",options:["Desativar antivírus","Usar senhas simples","Configurar proteção em tempo real"],answer:2},
+  {q:"SIEM é utilizado para:",options:["Aumentar velocidade","Analisar eventos de segurança","Bloquear vírus"],answer:1},
+  {q:"O que significa EDR?",options:["Endpoint Detection and Response","Extra Data Recovery","Electronic Data Routing"],answer:0},
+  {q:"Qual NÃO é ameaça digital?",options:["Vírus","Malware","Firewall"],answer:2}
+],[
+  {q:"O que é necessário para um antivírus funcionar corretamente?",options:["Manter atualizado","Desativar o firewall","Reiniciar computador"],answer:0},
+  {q:"Indício de infecção por malware?",options:["Sistema rápido","Tela azul","Comportamentos anormais"],answer:2},
+  {q:"Firewalls podem ser classificados em:",options:["Físico e Lógico","Antivírus e Proxy","Prevenção e Detecção"],answer:0},
+  {q:"Firewall de filtragem faz:",options:["Desliga a rede","Bloqueia/permite tráfego","Envia emails"],answer:1},
+  {q:"Proxy transparente é:",options:["Visível","Bloqueia vírus","Invisível"],answer:2}
+]];
 
-      setTimeout(() => {
-        if (!paused && gameArea.contains(enemy)) {
-          enemy.remove();
-          errors++;
-          updateStats();
-          endGame();
-        }
-      }, speed);
-    }
+/******* ELEMENTOS UI *******/
+const startScreen=$("start-screen");const endScreen=$("end-screen");const finalMsg=$("final-message");
+const reactionBtn=$("reaction-button");
+const memorySeq=$("memory-sequence");const dropAreaMem=$("memory-drop-area");const memSlots=$("memory-slots");const memIcons=$("memory-icons");
+const cadeadoContainer=$("cadeado-container");const cadeadoSlots=$("cadeado-drop-area");
+const dragItemsContainer=$("drag-items");const safeArea=$("safe-area");const threatArea=$("threat-area");
+const checkDragBtn=$("check-drag-btn");
+const quizBlocks=[$("quiz-block-1"),$("quiz-block-2"),$("quiz-block-3")];
 
-    function choose(tool) {
-      // Desativado para nova lógica
-    }
+/******* TELA INICIAL ********/
+$("start-btn").onclick=()=>{hide(startScreen);startMinigame1()};
 
-    function showQuiz() {
-      const q = questions[Math.floor(Math.random() * questions.length)];
-      document.getElementById("quizQuestion").innerText = q.q;
-      const options = document.getElementById("quizOptions");
-      options.innerHTML = "";
-      q.options.forEach((opt, i) => {
-        const btn = document.createElement("button");
-        btn.innerText = opt;
-        btn.onclick = () => {
-          if (i === q.a) {
-            score += 20;
-          } else {
-            errors++;
-          }
-          updateStats();
-          hideQuiz();
-        };
-        options.appendChild(btn);
-      });
-      document.getElementById("quizModal").style.display = "block";
-      document.getElementById("backdrop").style.display = "block";
-    }
+/******* MINIGAME 1 ********/
+let colorTimer;const palette=['#ff4d4d','#ff7f00','#ffd700','#00aaff','#aa00ff','#00aa00'];
+function startMinigame1(){state.currentStage=1;hide(...quizBlocks,endScreen,$("minigame-2"),$("minigame-3"),$("minigame-4"));show($("minigame-1"));
+  cycleColor();colorTimer=setInterval(cycleColor,1200);reactionBtn.onclick=()=>{
+    if(reactionBtn.style.backgroundColor==="rgb(0, 170, 0)"||reactionBtn.style.backgroundColor==="#00aa00"){
+      clearInterval(colorTimer);hide($("minigame-1"));startQuizBlock(0);
+    }else{clearInterval(colorTimer);gameOver();}
+  };}
+function cycleColor(){const c=palette[Math.floor(Math.random()*palette.length)];reactionBtn.style.backgroundColor=c;}
 
-    function hideQuiz() {
-      paused = false;
-      document.getElementById("quizModal").style.display = "none";
-      document.getElementById("backdrop").style.display = "none";
-      startEnemy();
-    }
+/******* QUIZZES *********/
+let currentBlock=0,currentQ=0;
+function startQuizBlock(idx){state.currentStage=1+idx*2;currentBlock=idx;currentQ=0;hide($("minigame-1"),$("minigame-2"),$("minigame-3"),$("minigame-4"),endScreen,...quizBlocks);show(quizBlocks[idx]);setupQuiz(quizBlocks[idx])}
+function setupQuiz(container){const qBox=container.querySelector('.question-box');const optDiv=container.querySelector('.quiz-options');const data=quizzes[currentBlock][currentQ];qBox.textContent=data.q;optDiv.innerHTML='';data.options.forEach((opt,i)=>{const b=document.createElement('button');b.textContent=opt;b.onclick=()=>{if(i===data.answer){state.totalCorrect++;currentQ++;if(currentQ>=quizzes[currentBlock].length){hide(container);if(currentBlock===0)startMinigame2();else if(currentBlock===1)startMinigame3();else startMinigame4()}else setupQuiz(container);}else gameOver()};optDiv.appendChild(b)})}
 
-    
-let gameEnded = false;
-function endGame() {
-  if (gameEnded) return;
-  gameEnded = true;
+/******* MINIGAME 2 (MEMÓRIA) ******/
+const memIconsList=['🛡️','🔥','🔒','🌐'];let memSequence=[];
+function startMinigame2(){state.currentStage=2;hide(...quizBlocks,$("minigame-1"),$("minigame-3"),$("minigame-4"),endScreen);show($("minigame-2"));dropAreaMem.classList.add('hidden');memorySeq.innerHTML='';
+  memSequence=[...memIconsList].sort(()=>0.5-Math.random());memSequence.forEach(ic=>{const d=document.createElement('div');d.className='memory-icon';d.textContent=ic;memorySeq.appendChild(d)});
+  setTimeout(()=>{memorySeq.innerHTML='';initMemDrag();},4500)}
+function initMemDrag(){dropAreaMem.classList.remove('hidden');memSlots.innerHTML='';memIcons.innerHTML='';
+  memSequence.forEach((ic,i)=>{const slot=document.createElement('div');slot.className='drop-slot';slot.id='mem-slot-'+i;slot.ondragover=e=>e.preventDefault();slot.ondrop=handleMemDrop;memSlots.appendChild(slot)});
+  const shuffled=[...memIconsList].sort(()=>0.5-Math.random());shuffled.forEach((ic,i)=>{const d=document.createElement('div');d.className='drag-emoji';d.textContent=ic;d.id='mem-emoji-'+i;d.draggable=true;d.ondragstart=e=>e.dataTransfer.setData('text/plain',d.id);memIcons.appendChild(d)})}
+function handleMemDrop(e){e.preventDefault();const id=e.dataTransfer.getData('text/plain');const el=$(id);if(!el||e.currentTarget.firstChild)return;e.currentTarget.appendChild(el);checkMemComplete()}
+function checkMemComplete(){if([...memSlots.children].some(s=>!s.firstChild))return;const built=[...memSlots.children].map(s=>s.firstChild.textContent).join('');if(built===memSequence.join('')){hide($("minigame-2"));startQuizBlock(1);}else gameOver()}
 
-      active = false;
-      document.getElementById("finalScore").innerText = score;
-      document.getElementById("finalBlocked").innerText = blocked;
-      document.getElementById("finalErrors").innerText = errors;
-      document.getElementById("endModal").style.display = "block";
-      document.getElementById("backdrop").style.display = "block";
-    }
+/******* MINIGAME 3 (CADEADO) ******/
+const palavra="FIREWALL";
+function startMinigame3(){state.currentStage=3;hide(...quizBlocks,$("minigame-1"),$("minigame-2"),$("minigame-4"),endScreen);show($("minigame-3"));cadeadoContainer.innerHTML='';cadeadoSlots.innerHTML='';
+  for(let i=0;i<palavra.length;i++){const slot=document.createElement('div');slot.className='drop-slot';slot.id='slot-'+i;slot.ondragover=e=>e.preventDefault();slot.ondrop=handleCadeadoDrop;cadeadoSlots.appendChild(slot)}
+  palavra.split('').map(l=>({l,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).forEach((obj,idx)=>{const d=document.createElement('div');d.className='cadeado-letter';d.textContent=obj.l;d.id='cad-'+idx;d.draggable=true;d.ondragstart=e=>e.dataTransfer.setData('text/plain',d.id);cadeadoContainer.appendChild(d)})}
+function handleCadeadoDrop(e){e.preventDefault();const id=e.dataTransfer.getData('text/plain');const el=$(id);if(!el||e.currentTarget.firstChild)return;e.currentTarget.appendChild(el);checkCadeado()}
+function checkCadeado(){if([...cadeadoSlots.children].some(s=>!s.firstChild))return;const word=[...cadeadoSlots.children].map(s=>s.firstChild.textContent).join('');if(word===palavra){hide($("minigame-3"));startQuizBlock(2);}else gameOver()}
 
-    function updateStats() {
-      document.getElementById("score").innerText = score;
-      document.getElementById("blocked").innerText = blocked;
-      document.getElementById("errors").innerText = errors;
-    }
-
-    window.onload = () => {
-  //    startEnemy();
-    };
-  
-
-function startGame() {
-  document.getElementById('startCard').style.display = 'none';
-  for (let i = 0; i < Math.min(1 + Math.floor(blocked / 10), 5); i++) {
-    setTimeout(startEnemy, i * 500);
-  }
+/******* MINIGAME 4 (ARRASTE) ******/
+const dragData=[{text:'Firewall',correct:'safe'},{text:'Vírus',correct:'threat'},{text:'Proxy',correct:'safe'},{text:'Malware',correct:'threat'},{text:'Antivírus',correct:'safe'}];
+function startMinigame4(){state.currentStage=4;hide(...quizBlocks,$("minigame-1"),$("minigame-2"),$("minigame-3"),endScreen);show($("minigame-4"));dragItemsContainer.innerHTML='';safeArea.innerHTML='<h3>Rede Segura</h3>';threatArea.innerHTML='<h3>Ameaça</h3>';
+  dragData.forEach((it,i)=>{const d=document.createElement('div');d.className='drag-item';d.textContent=it.text;d.id='drag-'+i;d.dataset.correct=it.correct;d.draggable=true;d.ondragstart=e=>e.dataTransfer.setData('text/plain',d.id);dragItemsContainer.appendChild(d)});
+  [safeArea,threatArea].forEach(area=>{area.ondragover=e=>e.preventDefault();area.ondrop=e=>{const id=e.dataTransfer.getData('text');const el=$(id);if(el)area.appendChild(el)}});
+  checkDragBtn.onclick=()=>{for(const [i,it] of dragData.entries()){const el=$("drag-"+i);if(!el)return gameOver();const pid=el.parentElement.id;if(!((it.correct==='safe'&&pid==='safe-area')||(it.correct==='threat'&&pid==='threat-area')))return gameOver()}state.totalCorrect+=5;hide($("minigame-4"));victory()}
 }
 
-
-// Parâmetros de dificuldade
-let gameTime = 0;
-let gameInterval;
-
-function startGame() {
-  document.getElementById('startCard').style.display = 'none';
-  gameTime = 0;
-
-  gameInterval = setInterval(() => {
-    gameTime++;
-
-    // Define o número de inimigos simultâneos
-    let numInimigos = Math.min(1 + Math.floor(gameTime / 5), 6); // até 6 inimigos com o tempo
-
-    for (let i = 0; i < numInimigos; i++) {
-      setTimeout(() => startEnemy(gameTime), i * 150);
-    }
-
-  }, 2000); // a cada 2 segundos, lança nova leva de ameaças
-}
-
-// Modificar a função startEnemy para considerar gameTime como parâmetro
-</script>
-<script>let enemyTimeouts = [];
-
-// === Patch: Proper pause during Quiz ===
-let gameInterval = null;
-
-// Override startGame with single clear logic
-function startGame() {
-  document.getElementById('startCard').style.display = 'none';
-  score = 0; blocked = 0; errors = 0; gameTime = 0;
-  updateStats();
-  launchWaves();
-}
-
-function launchWaves(){
-  if(gameInterval) clearInterval(gameInterval);
-  gameInterval = setInterval(()=> {
-    if(paused) return;
-     if(paused) return;            // don't spawn while paused
-     gameTime++;
-     let num = Math.min(1 + Math.floor(gameTime/5), 6);
-     for(let i=0;i<num;i++){
-        enemyTimeouts.push(setTimeout(()=>startEnemy(gameTime), i*150));
-     }
-  }, 2000);
-}
-
-// Pause/resume all current enemies animations
-function setEnemyAnimations(state){
-  document.querySelectorAll('.enemy').forEach(el=> el.style.animationPlayState = state);
-}
-
-// Modify showQuiz and hideQuiz
-function showQuiz(){
-  paused = true;
-  setEnemyAnimations('paused');     // freeze enemies
-  const q = questions[Math.floor(Math.random()*questions.length)];
-  const qEl = document.getElementById('quizQuestion');
-  const opts = document.getElementById('quizOptions');
-  qEl.textContent = q.q;
-  opts.innerHTML = '';
-  q.options.forEach((opt,i)=>{
-     const b = document.createElement('button');
-     b.textContent = opt;
-     b.onclick = ()=> {
-        if(i===q.a){ score+=20; } else { errors++; }
-        updateStats();
-        hideQuiz();
-     };
-     opts.appendChild(b);
-  });
-  document.getElementById('quizModal').style.display='block';
-  document.getElementById('backdrop').style.display='block';
-}
-
-function hideQuiz(){
-  document.getElementById('quizModal').style.display='none';
-  document.getElementById('backdrop').style.display='none';
-  paused = false;
-  setEnemyAnimations('running');    // resume enemies
-}
-
-// Ensure no enemy waves before startGame click
-window.onload = ()=>{};
+/******* TELAS FINAIS ********/
+function gameOver(){hide($("minigame-1"),$("minigame-2"),$("minigame-3"),$("minigame-4"),...quizBlocks,startScreen);show(endScreen);finalMsg.textContent='Erro! Sua rede foi infectada.'}
+function victory(){hide($("minigame-1"),$("minigame-2"),$("minigame-3"),$("minigame-4"),...quizBlocks,startScreen);show(endScreen);finalMsg.textContent='Parabéns! Você defendeu sua rede com sucesso!'}
+$("restart-btn").onclick=()=>{state.currentStage=0;state.totalCorrect=0;hide(endScreen,$("minigame-1"),$("minigame-2"),$("minigame-3"),$("minigame-4"),...quizBlocks);show(startScreen)};
 </script></body>
 </html>
