@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Responsividade no Desenvolvimento Web — Apresentação</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+<div class="progress" id="progress"></div>
+
+<main class="deck" id="deck" aria-live="polite">
+
+  <!-- SLIDE 1: INTRO -->
+  <section class="slide active" role="group" aria-roledescription="slide" aria-label="Introdução">
+    <div class="hero">
+      <h1>Responsividade no Desenvolvimento Web</h1>
+      <h2>Introdução</h2>
+      <p><strong>O que é responsividade?</strong> É a capacidade de um site <em>adaptar-se</em> automaticamente a diferentes tamanhos de tela e contextos de uso (mobile, tablet, desktop), mantendo legibilidade, usabilidade e estética.</p>
+      <p><strong>Por que é essencial?</strong> Usuários acessam a web em múltiplos dispositivos. Um design responsivo melhora a experiência, SEO, velocidade de navegação e conversão — além de reduzir manutenção ao evitar versões separadas do site.</p>
+      <div class="foot">Dica: você pode navegar com <span class="kbd">←</span> e <span class="kbd">→</span> ou usar os botões abaixo.</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: BREAKPOINTS -->
+  <section class="slide" role="group" aria-roledescription="slide" aria-label="Breakpoints">
+    <h1>Breakpoints</h1>
+    <p><strong>O que é breakpoint?</strong> Pontos de corte (larguras) que disparam mudanças no layout via <em>media queries</em>.</p>
+    <p><strong>Para que servem?</strong> Para ajustar tipografia, espaçamentos e o arranjo dos elementos conforme a largura da viewport.</p>
+
+    <div class="grid-2">
+      <div>
+        <h2>Tamanhos comuns</h2>
+        <table aria-label="Tabela de breakpoints">
+          <thead>
+            <tr><th>Dispositivo</th><th>Largura (min-width)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Mobile</td><td>0–767px</td></tr>
+            <tr><td>Tablet</td><td>≥ 768px</td></tr>
+            <tr><td>Desktop</td><td>≥ 1024px</td></tr>
+            <tr><td>Large Desktop</td><td>≥ 1280px</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Exemplo com <code>@media</code></h2>
+        <pre><code>/* Base (mobile first) */
+.card { padding: 16px; font-size: 1rem; }
+
+/* Tablet */
+@media (min-width: 768px) {
+  .card { padding: 24px; font-size: 1.125rem; }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .card { padding: 32px; font-size: 1.25rem; }
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: UNIDADES RELATIVAS -->
+  <section class="slide" role="group" aria-roledescription="slide" aria-label="Unidades relativas">
+    <h1>Unidades relativas</h1>
+    <div class="grid-2">
+      <div>
+        <h2>Definições</h2>
+        <ul>
+          <li><strong>em</strong>: relativo ao <em>font-size</em> do elemento pai.</li>
+          <li><strong>rem</strong>: relativo ao <em>font-size</em> da raiz (<code>&lt;html&gt;</code>).</li>
+          <li><strong>%</strong>: relativo ao tamanho do elemento pai (largura/altura, etc.).</li>
+          <li><strong>vw</strong>: 1% da largura da viewport.</li>
+          <li><strong>vh</strong>: 1% da altura da viewport.</li>
+        </ul>
+        <p><strong>Relativas vs absolutas</strong>: relativas escalam conforme contexto; absolutas (px, cm) não se adaptam por padrão.</p>
+        <p><strong>Vantagens</strong>: tipografia fluida, melhor acessibilidade e consistência entre breakpoints.</p>
+      </div>
+      <div>
+        <h2>Exemplo prático</h2>
+        <p class="muted">Use o controle para variar o <code>font-size</code> raiz (<code>rem</code>):</p>
+        <label for="fsRange">Tamanho base (rem): <span id="fsVal">1.00</span>rem</label>
+        <input id="fsRange" type="range" min="0.75" max="1.5" step="0.01" value="1.00" aria-label="Ajustar tamanho base" />
+        <div class="card" style="margin-top:10px">
+          <p style="font-size: 1rem;">Texto 1rem (fixo a 1 × raiz)</p>
+          <p style="font-size: 1.25rem;">Texto 1.25rem (1.25 × raiz)</p>
+          <p style="font-size: 2vw;">Texto 2vw (escala com largura da janela)</p>
+        </div>
+        <pre><code>html { font-size: 16px; /* 1rem */ }
+.title { font-size: 1.25rem; }
+.lead  { font-size: clamp(1rem, 2vw + .5rem, 1.5rem); }</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: DEMONSTRAÇÃO AO VIVO -->
+  <section class="slide" role="group" aria-roledescription="slide" aria-label="Demonstração ao vivo">
+    <h1>Demonstração ao vivo (redimensione a janela)</h1>
+    <div class="live-demo">
+      <div class="demo-box">
+        <div class="demo-item">A</div>
+        <div class="demo-item">B</div>
+        <div class="demo-item">C</div>
+      </div>
+      <div class="demo-state" id="demoState">Estado atual: Mobile (1 coluna, cores claras)</div>
+    </div>
+    <div class="foot">Dica: experimente arrastar a borda da janela para ver as cores/grade mudarem nos breakpoints (768px e 1024px).</div>
+
+    <h2 style="margin-top:20px">CSS da demo</h2>
+    <pre><code>/* Base: 1 coluna, cores claras */
+.demo-box { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.demo-item:nth-child(1) { background: #bfdbfe; } /* azul claro */
+.demo-item:nth-child(2) { background: #bbf7d0; } /* verde claro */
+.demo-item:nth-child(3) { background: #fde68a; } /* amarelo claro */
+
+/* Tablet (≥768px): 2 colunas, médio */
+@media (min-width: 768px) {
+  .demo-box { grid-template-columns: repeat(2, 1fr); }
+  .demo-item:nth-child(1) { background: #60a5fa; } /* azul médio */
+  .demo-item:nth-child(2) { background: #4ade80; } /* verde médio */
+  .demo-item:nth-child(3) { background: #facc15; } /* amarelo médio */
+}
+
+/* Desktop (≥1024px): 3 colunas, forte */
+@media (min-width: 1024px) {
+  .demo-box { grid-template-columns: repeat(3, 1fr); }
+  .demo-item:nth-child(1) { background: #2563eb; } /* azul forte */
+  .demo-item:nth-child(2) { background: #16a34a; } /* verde forte */
+  .demo-item:nth-child(3) { background: #ca8a04; } /* amarelo forte */
+}</code></pre>
+  </section>
+
+  <!-- SLIDE 5: FLEXBOX & GRID -->
+  <section class="slide" role="group" aria-roledescription="slide" aria-label="Flexbox e Grid">
+    <h1>Layouts responsivos com Flexbox & Grid</h1>
+    <div class="grid-2">
+      <div>
+        <h2>Flexbox (cards fluídos)</h2>
+        <div class="flex-show gallery" aria-label="Exemplo Flexbox">
+          <div class="item">Card 1</div>
+          <div class="item">Card 2</div>
+          <div class="item">Card 3</div>
+          <div class="item">Card 4</div>
+        </div>
+        <pre><code>.container { display: flex; gap: 12px; flex-wrap: wrap; }
+.container &gt; .item { flex: 1 1 220px; }</code></pre>
+      </div>
+      <div>
+        <h2>CSS Grid (auto-fit)</h2>
+        <div class="grid-show gallery" aria-label="Exemplo Grid">
+          <div class="item">Bloco 1</div>
+          <div class="item">Bloco 2</div>
+          <div class="item">Bloco 3</div>
+          <div class="item">Bloco 4</div>
+        </div>
+        <pre><code>.grid { display: grid; gap: 12px; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: ENCERRAMENTO / RECAP -->
+  <section class="slide" role="group" aria-roledescription="slide" aria-label="Recap e referências">
+    <h1>Recap</h1>
+    <ul>
+      <li>Responsividade = adaptar layout/UX a qualquer tela.</li>
+      <li>Breakpoints via <code>@media</code> mudam tipografia/grade.</li>
+      <li>Unidades relativas (rem, em, vw/vh, %) tornam tudo escalável.</li>
+      <li>Flexbox e Grid facilitam composições fluidas.</li>
+    </ul>
+    <p class="muted">Dica final: comece <em>mobile-first</em>, use unidades relativas e componha com Grid/Flex. Ajuste o mínimo necessário em cada breakpoint.</p>
+  </section>
+
+  <!-- SLIDE 7: AGRADECEMOS -->
+  <section class="slide" role="group" aria-roledescription="slide" aria-label="Agradecemos">
+    <div class="thanks">
+      <h1>Agradecemos! 🎉</h1>
+      <p>Obrigado por acompanhar. Veja o nosso grande professor abaixo.</p>
+      <img id="memberPhoto" alt="Foto do integrante" src="imagens/WhatsApp_Image_2025-08-11_at_16.13.23-removebg-preview.png" />
+      <button class="btn" id="replayFx">Repetir fogos</button>
+      <small>Dica: este slide dispara uma animação de fogos ao entrar.</small>
+    </div>
+  </section>
+
+</main>
+
+<!-- Navegação -->
+<div class="nav" aria-hidden="false">
+  <div class="nav-inner" id="toolbar">
+    <button class="btn" id="prevBtn" aria-label="Slide anterior">←</button>
+    <div id="dots" aria-label="Indicadores de slide" style="display:flex; gap:8px"></div>
+    <button class="btn" id="nextBtn" aria-label="Próximo slide">→</button>
+    <button class="btn secondary toolbar-jump" id="jumpLast" title="Ir para Agradecimentos">Agradecemos</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const deck = document.getElementById('deck');
+  const slides = Array.from(deck.querySelectorAll('.slide'));
+  const dots = document.getElementById('dots');
+  const prev = document.getElementById('prevBtn');
+  const next = document.getElementById('nextBtn');
+  const progress = document.getElementById('progress');
+  const demoState = document.getElementById('demoState');
+  const fsRange = document.getElementById('fsRange');
+  const fsVal = document.getElementById('fsVal');
+  const jumpLast = document.getElementById('jumpLast');
+  const toolbar = document.getElementById('toolbar');
+
+  let i = 0;
+  const total = slides.length;
+
+  // Criar dots
+  slides.forEach((_, idx) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (idx === 0 ? ' active' : '');
+    d.role = 'button';
+    d.tabIndex = 0;
+    d.title = `Ir para o slide ${idx+1}`;
+    d.addEventListener('click', () => go(idx));
+    d.addEventListener('keydown', (e) => { if(e.key==='Enter' || e.key===' '){ go(idx); }});
+    dots.appendChild(d);
+  });
+
+  function updateUI(){
+    slides.forEach((s, idx)=> s.classList.toggle('active', idx===i));
+    Array.from(dots.children).forEach((d, idx)=> d.classList.toggle('active', idx===i));
+    prev.disabled = i === 0; next.disabled = i === total-1;
+    progress.style.transform = `scaleX(${(i+1)/total})`;
+    // Mostra o botão de pulo para o último slide quando não estamos nele
+    toolbar.classList.toggle('show-jump', i !== total-1);
+    if (i === total-1) launchFireworks(2500); // fogos ao entrar no último slide
+  }
+
+  function go(n){ i = Math.max(0, Math.min(total-1, n)); updateUI(); }
+  function nextSlide(){ go(i+1); }
+  function prevSlide(){ go(i-1); }
+
+  next.addEventListener('click', nextSlide);
+  prev.addEventListener('click', prevSlide);
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight') nextSlide();
+    if(e.key==='ArrowLeft') prevSlide();
+  });
+  jumpLast.addEventListener('click', ()=> go(total-1));
+
+  // Atualiza label de estado da demo ao vivo conforme largura
+  function setDemoState(){
+    const w = window.innerWidth;
+    let label = 'Mobile (1 coluna, cores claras)';
+    if(w >= 1024) label = 'Desktop (3 colunas, cores fortes)';
+    else if(w >= 768) label = 'Tablet (2 colunas, cores médias)';
+    if(demoState) demoState.textContent = `Estado atual: ${label}`;
+  }
+  window.addEventListener('resize', setDemoState);
+  setDemoState();
+
+  // Slider de tamanho base (rem)
+  if(fsRange){
+    const applyFs = (v) => {
+      document.documentElement.style.setProperty('--fs', `${v}rem`);
+      fsVal.textContent = Number(v).toFixed(2);
+    };
+    fsRange.addEventListener('input', (e)=> applyFs(e.target.value));
+    applyFs(fsRange.value);
+  }
+
+
+
+
+  // --- Fogos de artifício (canvas) ---
+  const canvas = document.getElementById('fireworks');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let rafId;
+
+  function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function spawnFirework(x, y, colors){
+    const count = 80;
+    for(let i=0;i<count;i++){
+      const angle = (Math.PI * 2) * (i / count);
+      const speed = 1 + Math.random() * 3.5;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 60 + Math.random()*30,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        alpha: 1
+      });
+    }
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy + 0.02; // leve gravidade
+      p.vx *= 0.99; p.vy *= 0.99;
+      p.life--; p.alpha = Math.max(0, p.life/90);
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+      ctx.fill();
+    });
+    particles = particles.filter(p => p.life > 0 && p.alpha > 0.02);
+    rafId = requestAnimationFrame(animate);
+  }
+
+  function randomBetween(min, max){ return Math.random()*(max-min)+min; }
+
+  function launchFireworks(duration=3500){
+    // lança fogos em posições aleatórias por 'duration' ms
+    const colors = ['#60a5fa','#22c55e','#f59e0b','#ef4444','#a78bfa'];
+    const start = performance.now();
+    cancelAnimationFrame(rafId);
+    animate();
+    (function loop(now){
+      if(now - start < duration){
+        spawnFirework(randomBetween(100, canvas.width-100), randomBetween(80, canvas.height-180), colors);
+        setTimeout(()=>loop(performance.now()), 250);
+      } else {
+        setTimeout(()=>{ particles=[]; }, 1200);
+      }
+    })(start);
+  }
+
+  const replayFx = document.getElementById('replayFx');
+  if(replayFx){
+    replayFx.addEventListener('click', ()=> launchFireworks(2500));
+  }
+
+  // inicializa UI
+  updateUI();
+})();
+</script>
+</body>
+</html>
